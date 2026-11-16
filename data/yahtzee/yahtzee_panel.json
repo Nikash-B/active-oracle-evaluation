@@ -1,0 +1,87 @@
+{
+ "panel": {
+  "optimal": {
+   "expected_score": 254.5877287344957,
+   "sd": 59.60788108721793,
+   "gap_vs_optimal": 0.0,
+   "on_policy_regret": 0.0,
+   "identity_error": 0.0,
+   "seconds": 140.738999541034
+  },
+  "noisy_s0.5": {
+   "expected_score": 254.36867008961016,
+   "sd": 59.62137104675529,
+   "gap_vs_optimal": 0.2190586448855356,
+   "on_policy_regret": 0.2190586448855833,
+   "identity_error": 4.7684078907650473e-14,
+   "seconds": 141.76538708410226
+  },
+  "noisy_s1": {
+   "expected_score": 253.78109989417965,
+   "sd": 59.59863158726276,
+   "gap_vs_optimal": 0.8066288403160513,
+   "on_policy_regret": 0.8066288403160048,
+   "identity_error": 4.651834473179406e-14,
+   "seconds": 145.367884458974
+  },
+  "noisy_s2": {
+   "expected_score": 251.0814443174046,
+   "sd": 59.33252959864652,
+   "gap_vs_optimal": 3.506284417091109,
+   "on_policy_regret": 3.5062844170910474,
+   "identity_error": 6.17284001691587e-14,
+   "seconds": 150.01541175006423
+  },
+  "noisy_s5": {
+   "expected_score": 235.3242327524738,
+   "sd": 59.2716080932182,
+   "gap_vs_optimal": 19.263495982021908,
+   "on_policy_regret": 19.263495982021837,
+   "identity_error": 7.105427357601002e-14,
+   "seconds": 152.271285291994
+  },
+  "noisy_s15": {
+   "expected_score": 174.5796473934856,
+   "sd": 53.01232755934549,
+   "gap_vs_optimal": 80.0080813410101,
+   "on_policy_regret": 80.00808134100994,
+   "identity_error": 1.5631940186722204e-13,
+   "seconds": 143.79529837495647
+  },
+  "noisy_s50": {
+   "expected_score": 122.02409374333247,
+   "sd": 36.17556289393854,
+   "gap_vs_optimal": 132.5636349911632,
+   "on_policy_regret": 132.56363499116327,
+   "identity_error": 5.684341886080802e-14,
+   "seconds": 138.86963029194158
+  },
+  "greedy": {
+   "expected_score": 217.38606121547053,
+   "sd": 48.9777270297859,
+   "gap_vs_optimal": 37.201667519025165,
+   "on_policy_regret": 37.20166751902514,
+   "identity_error": 2.1316282072803006e-14,
+   "seconds": 127.0055259159999
+  },
+  "heuristic": {
+   "expected_score": 220.68040975312317,
+   "sd": 48.900705848466735,
+   "gap_vs_optimal": 33.907318981372526,
+   "on_policy_regret": 33.907318981372484,
+   "identity_error": 4.263256414560601e-14,
+   "seconds": 124.56791445892304
+  },
+  "fixed_order": {
+   "expected_score": 51.30588038034937,
+   "sd": 17.37120217842246,
+   "gap_vs_optimal": 203.28184835414632,
+   "on_policy_regret": 203.2818483541456,
+   "identity_error": 7.105427357601002e-13,
+   "seconds": 123.35666845797095
+  }
+ },
+ "seed": 20260831,
+ "v_star_start": 254.5877287344957,
+ "worst_identity_error": 7.105427357601002e-13
+}

@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "active-oracle-evaluation"
+version = "0.0.0"
+description = "Rating agents by regret against an oracle on a frozen decision suite."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Backgammon Project" }]
+keywords = ["backgammon", "yahtzee", "evaluation", "reinforcement-learning"]
+
+# The game engine uses only the Python standard library.
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Nikash-B/active-oracle-evaluation"
+
+[project.optional-dependencies]
+# Analysis code: covers every command that reads the shipped score caches.
+nn = [
+    "torch>=2.0",
+    "numpy>=2.0",
+    "scipy>=1.10",
+]
+# Formatting and linting.
+dev = [
+    "ruff>=0.1",
+]
+# GNU Backgammon bindings, needed only to label a decision suite from scratch. Pinned because
+# the oracle's equities are the labels behind every reported number. Native wheels cover
+# Python 3.10-3.13.
+oracle = [
+    "gnubg-nn==1.1.0a8",
+]
+# Reader for eXtreme Gammon's .xg analysis files, needed only by the xg_oracle experiment.
+xg = [
+    "xgdatatools==0.0.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["active_oracle_evaluation*", "puretd*"]
+
+[tool.ruff]
+extend-exclude = ["puretd"]
+line-length = 100
+target-version = "py312"

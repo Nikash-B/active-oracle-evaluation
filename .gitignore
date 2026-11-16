@@ -1,0 +1,17 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ruff_cache/
+
+# Experiment outputs
+outputs/
+
+# OS files
+.DS_Store
+
+# The large checkpoints from the release download
+models/champion.pt
+models/ar_0053.pt
+models/ar_0102.pt
+models/cp_0215.pt

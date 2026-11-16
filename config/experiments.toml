@@ -1,0 +1,1350 @@
+# Settings of every experiment, one table per experiment module.
+# Each value has a comment that names where it comes from: the paper section, table or
+# figure that states it, prior work, or "chosen for this study".
+
+[agent_ratings]
+# Duplicate-dice trials per pairing; chosen for this study. The paper's runs pass 60 (appendix
+# "Validity of the oracle rating", paragraph "Anchored round-robin"; appendix "Phase diagnostics and
+# search ablation", paragraph "Learning curve").
+pairs = 150
+# Dice-bank seed; chosen for this study. The learning-curve run of the paper (appendix "Phase
+# diagnostics and search ablation", paragraph "Learning curve") passes 20260628.
+seed = 20260627
+# Oracle evaluation depth: 0-ply, from the paper's section "Evaluation protocol", paragraph
+# "Oracle".
+plies = 0
+
+[alpha_rank_clones]
+# Alpha-rank selection intensities swept on every panel; chosen for this study, the same sweep as
+# cyclic_triple's alpha-rank. The paper (appendix "Validity of the oracle rating", paragraph "Panel
+# composition") reports the largest total-variation shift over this sweep.
+alphas = [0.1, 1.0, 10.0, 100.0, 1000.0]
+# Largest eigenvector-vs-linear-solve gap for a stationary distribution to count as resolved,
+# and the tolerance for Nash averaging to count as clone-invariant; chosen for this study.
+tolerance = 1e-6
+# Agents with less alpha-rank mass than this are left out of the order comparison; chosen for
+# this study.
+mass_floor = 1e-6
+# Tolerance for matching the Elo shifts of nash_averaging's clone cells: half of the one-decimal
+# precision at which the paper (appendix "Validity of the oracle rating", paragraph "Panel
+# composition") states Elo shifts.
+elo_print_precision = 0.05
+# Tolerance for the exact-reproduction controls (clone injection, cyclic_triple's alpha-rank and
+# its stationary distributions); chosen for this study.
+control_tolerance = 1e-9
+
+[annotator_depth]
+# Annotator search depths in ply. Paper: appendix "Validity of the oracle rating", paragraph "An
+# oracle no stronger than the pool", and the table of PR at four search depths (columns 0-ply to
+# 3-ply).
+depths = [0, 1, 2, 3]
+# Deepest pool member: the engine at 2 ply. Paper: appendix "Validity of the oracle rating",
+# paragraph "An oracle no stronger than the pool" (the pool contains the engine at three of the four
+# depths), and the table of PR at four search depths.
+pool_max_ply = 2
+# Agents in report order. Paper: appendix "Validity of the oracle rating", row order of the table of
+# PR at four search depths.
+agents = ["gnubg2", "gnubg1", "sel3", "puretd", "gnubg0", "search2"]
+# Depth pairs compared. Chosen for this study; the paper quotes (0, 2) and (2, 3) in appendix
+# "Validity of the oracle rating", paragraph "An oracle no stronger than the pool".
+depth_pairs = [[0, 1], [0, 2], [0, 3], [1, 3], [2, 3]]
+# Positions in the frozen suite. Paper: appendix "Validity of the oracle rating", paragraph "An
+# oracle no stronger than the pool", and the caption of the table of PR at four search depths.
+suite_size = 1000
+
+[bearoff_domain]
+# Minimum checkers borne off per side for a position to be in the exact bear-off table's domain; one
+# checker off each side rules out gammons. Chosen for this study (the domain is the region of the
+# paper's appendix "Validity of the oracle rating", paragraph "Exact-value check (bear-off)").
+min_checkers_off = 1
+# Suite phase label compared against the domain; the bear-off phase is defined in the paper's
+# appendix "Phase diagnostics and search ablation", paragraph "Phases".
+phase_label = "bearoff"
+
+[bearoff_exact]
+# Unforced decisions sampled on the bear-off slice: 1,500, from the paper's appendix "Validity of
+# the oracle rating", paragraph "Exact-value check (bear-off)".
+n_decisions = 1500
+# Decision-sampling seed; chosen for this study. The bootstrap uses seed + 1.
+seed = 227
+# Bootstrap resamples of the decisions for the paired PR contrasts; chosen for this study.
+n_bootstrap = 2000
+# Quantiles of the 95% percentile bootstrap interval; chosen for this study. A pair separates when
+# this interval excludes 0 (paper, appendix "Validity of the oracle rating", paragraph "Exact-value
+# check (bear-off)").
+interval_quantiles = [0.025, 0.975]
+# Quantile of the absolute oracle equity error reported as p95_abs; chosen for this study.
+error_quantile = 0.95
+# PR = 500 x mean equity loss per unforced decision, from the paper's section "Evaluation protocol",
+# paragraph "Rating" (the GNU Backgammon / eXtreme Gammon PR convention).
+pr_scale = 500.0
+# Most checkers still on per side in a sampled state (each placed uniformly on points 1-6);
+# chosen for this study.
+max_checkers_on = 14
+# Decisions between progress lines; chosen for this study.
+progress_every = 250
+
+# Seven-agent panel (21 pairs), from the paper's appendix "Validity of the oracle rating", paragraph
+# "Exact-value check (bear-off)". Checkpoint agents choose 1-ply greedy moves and gnubg plays at 0
+# plies; checkpoint paths are relative to the repository root.
+[[bearoff_exact.panel]]
+name = "random"
+spec = "random"
+
+[[bearoff_exact.panel]]
+name = "pubeval"
+spec = "pubeval"
+
+[[bearoff_exact.panel]]
+name = "gnubg0"
+spec = "gnubg:0"
+
+[[bearoff_exact.panel]]
+name = "ar_0053"
+spec = "v2a"
+checkpoint = "models/ar_0053.pt"
+
+[[bearoff_exact.panel]]
+name = "ar_0102"
+spec = "v2b"
+checkpoint = "models/ar_0102.pt"
+
+[[bearoff_exact.panel]]
+name = "champion"
+spec = "v2c"
+checkpoint = "models/champion.pt"
+
+[[bearoff_exact.panel]]
+name = "cp_r237"
+spec = "v2d"
+checkpoint = "models/cp_0215.pt"
+
+# Settings of the decision-suite build (python -m active_oracle_evaluation.experiments.build_suite).
+# The defaults below build a small one-agent suite. The paper's frozen suite overrides them on the
+# command line; the module docstring gives that command.
+
+[build_suite]
+# Agent specs that drive self-play. Chosen for this study as a quick default. The paper's suite uses
+# eight agents (appendix "Experimental protocol", paragraph "Frozen decision suite and active
+# selection": 300 decisions per agent).
+agents = ["random"]
+# Total unforced decisions, split evenly across agents with the remainder to the last agent. Chosen
+# for this study as a quick default. The paper's suite has 2,400 decisions (appendix "Experimental
+# protocol", paragraph "Frozen decision suite and active selection").
+n = 200
+# Base seed; agent i uses seed + i. Chosen for this study; it is the project's global seed
+# (README, Pinning section: per-agent seeds 20260628 to 20260635).
+seed = 20260628
+# Oracle search depth for the labels. The paper fixes the oracle at 0-ply (section "Evaluation
+# protocol", paragraph "Oracle").
+plies = 0
+# Cap on plies per self-play game. Chosen for this study.
+max_plies = 400
+
+# Settings of the design-source comparison
+# (python -m active_oracle_evaluation.experiments.cheap_steering).
+
+[cheap_steering]
+# Label budgets K. The paper reports every budget of this list (appendix "Experimental protocol":
+# the columns of the table of mean Kendall tau under plain-mean and Horvitz-Thompson ranking, and
+# paragraph "Margins over uniform sampling": "at every budget").
+ks = [50, 100, 250, 500, 1000]
+# Draws per budget. The paper uses 400 draws on the full panel (appendix "Experimental protocol",
+# paragraph "Margins over uniform sampling").
+seeds = 400
+# Noise levels of the noisy:sigma designs, in units of the regret matrix standard deviation.
+# Chosen for this study.
+sigmas = [0.25, 0.5, 1.0, 2.0, 4.0]
+# Base of the noise seed; a draw uses noise_seed_base + int(1000 * sigma) + seed.
+# Chosen for this study.
+noise_seed_base = 90000
+
+[clone_invariance]
+# Label budgets K; chosen for this study, a subset of the budgets of the paper's appendix
+# "Experimental protocol", paragraph "Frozen decision suite and active selection".
+ks = [100, 250, 500, 1000]
+# Selection draws per budget and rule (seeds 0 to seeds - 1); the paper (appendix "Validity of the
+# oracle rating", paragraph "Panel composition") states "over 200 draws".
+seeds = 200
+# The four selection rules of the paper's appendix "Experimental protocol", paragraph "Frozen
+# decision suite and active selection".
+strategies = ["random", "phase_balanced", "disagreement", "active_rank"]
+# Active-rank steers on the losses of the agents the selector sees; chosen for this study.
+importance = "skyline"
+# A paired difference counts as a change when it exceeds this many standard errors; the paper
+# (appendix "Validity of the oracle rating", paragraph "Panel composition") states "two standard
+# errors".
+flag_standard_errors = 2
+# Agent pinned at 0 Elo; the paper's sections "Related work" and "Evaluation protocol" anchor Elo to
+# pubeval. The fallback, pinned when pubeval is the duplicated agent, is chosen for this study.
+anchor = "pubeval"
+anchor_fallback = "v2"
+# The eight-agent panel of the paper's appendix "Validity of the oracle rating", paragraph "Panel
+# composition", as named in the 18-agent score cache.
+base_panel = ["random", "heuristic", "pubeval", "v1", "v2", "ppo", "az75", "dxlarge"]
+
+# Near-duplicate families in the 18-agent score cache; each adds the siblings of a base agent
+# (az75 and dxlarge are in the base panel). Chosen for this study.
+[clone_invariance.clone_families]
+az = ["az25", "az50"]
+distill = ["dlarge", "dphasecap"]
+rollout = ["rblended", "rdisag", "rscaled"]
+
+# Settings of the subset rating-validity analysis
+# (python -m active_oracle_evaluation.experiments.cluster_validity).
+# The resampling seed is not set here: it is the seed stored in the input round-robin file.
+
+[cluster_validity]
+# Elo-resampling replicates for the Kendall tau interval. Chosen for this study.
+tau_ci_reps = 2000
+# Percentiles of the Elo-resampling tau interval (a 95% percentile interval). Chosen for this
+# study.
+tau_ci_percentiles = [2.5, 97.5]
+# A subset passes when its agent-clustered slope interval excludes 0 and its tau permutation
+# p-value is below this threshold. Chosen for this study.
+p_threshold = 0.05
+# Significant figures at which the all8 refit is compared with the tau, slope and R^2 stored in
+# the input file. Chosen for this study.
+match_sig_figs = 3
+
+# Agent subsets on which Elo is refit. Order within a subset does not matter: it is re-derived
+# from PR and Elo.
+[cluster_validity.subsets]
+# The full eight-agent panel (paper, appendix "Validity of the oracle rating", paragraph "Anchored
+# round-robin").
+all8 = ["random", "heuristic", "pubeval", "v1", "v2", "ppo", "az", "distilled"]
+# The panel without the random player. Chosen for this study.
+no_random = ["heuristic", "pubeval", "v1", "v2", "ppo", "az", "distilled"]
+# The competitive cluster, the six agents other than the heuristic and random players (paper,
+# caption of the label-efficiency figure in the results subsection "Active selection orders the
+# competitive cluster from fewer labels"; appendix "Statistical protocol: derivations and
+# definitions", paragraph "Rank agreement", reports tau = 1.0 on it).
+no_random_heuristic = ["pubeval", "v1", "v2", "ppo", "az", "distilled"]
+# The learned agents only. Chosen for this study.
+learned_only = ["v1", "v2", "ppo", "az", "distilled"]
+# The four closest agents at the top of the panel. Chosen for this study.
+inner4 = ["az", "pubeval", "v2", "ppo"]
+
+# Settings of the cyclic-triple experiment
+# (python -m active_oracle_evaluation.experiments.cyclic_triple).
+# The paper states the construction only in words (appendix "Validity of the oracle rating",
+# paragraph "Transitivity and a reversal": three agents that share one network and play at full
+# strength only against a designated opponent). Every value below is chosen for this study unless
+# its comment says otherwise.
+
+[cyclic_triple]
+# Signature point of cycle agents 0, 1 and 2 (each agent's own-point numbering). Chosen for this
+# study.
+signature_points = [1, 2, 3]
+# Near-best equity window in which an agent keeps its signature blot. Chosen for this study.
+delta = 0.05
+# Wider window for the first early_moves decisions of each game. Chosen for this study.
+delta_early = 0.12
+early_moves = 12
+# Probability of a uniformly random move in weak mode. Chosen for this study.
+eps = 0.35
+# Consecutive prey sightings that switch an agent to strong play for the rest of the game.
+# Chosen for this study.
+sticky_k = 2
+# A board counts as a new game when its summed point difference from the start position is at
+# most this. Chosen for this study.
+new_game_max_diff = 4
+# Prefix of each agent's RNG seed string "<prefix>:<agent>:<seed>". Chosen for this study.
+agent_seed_prefix = "ct0231"
+
+# Round robin. Duplicate-dice pairs per pairing (split into n_shards shards, so 400 gives
+# 396 pairs = 792 games per pairing) and parallel worker processes. Chosen for this study.
+pairs = 400
+workers = 15
+n_shards = 6
+# Shard s of pairing p uses dice seed dice_seed_base * (p + 1) + s and agent seed
+# agent_seed_base * (p + 1) + s (the opponent uses agent seed + 1). Chosen for this study.
+dice_seed_base = 100
+agent_seed_base = 1000
+# Cycle certified when every edge's z score exceeds this. Chosen for this study.
+cycle_min_z = 2
+
+# Performance Rating suite. Sampler i (from 0) builds positions_per_sampler positions with seed
+# suite_seed + sampler_seed_step * (i + 1). Chosen for this study.
+samplers = ["heuristic", "v2:models/v2.pt"]
+positions_per_sampler = 2000
+suite_seed = 20260811
+sampler_seed_step = 1000
+# Oracle search depth for the suite labels. The paper fixes the oracle at 0-ply (section "Evaluation
+# protocol", paragraph "Oracle").
+oracle_plies = 0
+# Seed of the reference and cycle agents and of the bootstrap intervals in the suite scores.
+# Chosen for this study.
+eval_seed = 231
+
+# Ratings. Alpha-rank selection intensities (method of Omidshafiei et al., 2019). Chosen for
+# this study.
+alphas = [0.1, 1.0, 10.0, 100.0, 1000.0]
+# Bradley-Terry fit: maximum iterations and convergence tolerance. Chosen for this study.
+bt_iterations = 5000
+bt_tolerance = 1e-12
+# Largest |A p*| accepted for the exact Nash equilibrium of the 3-cycle. Chosen for this study.
+nash_tolerance = 1e-12
+
+# Settings of the rating-validity experiment
+# (python -m active_oracle_evaluation.experiments.elo_validity).
+
+[elo_validity]
+# Agent specs of the eight-agent panel: built-in agents by name, checkpoints as label:path relative
+# to the repo root. From the paper's appendix "Validity of the oracle rating", the table of PR and
+# anchored Elo of the eight agents.
+agents = [
+    "random",
+    "heuristic",
+    "pubeval",
+    "v1:models/v1.pt",
+    "v2:models/v2.pt",
+    "ppo:models/ppo.pt",
+    "az:models/az75.pt",
+    "distilled:models/distilled.pt",
+]
+# Round-robin games per pairing for the Elo fit. From the paper's appendix "Validity of the oracle
+# rating", paragraph "Anchored round-robin" (60 games per pairing).
+games = 60
+# Duplicate-dice pairs per pairing for PR. From the paper's appendix "Validity of the oracle
+# rating", paragraph "Anchored round-robin" (60 duplicate-dice trials, 120 games, per pairing).
+pairs = 60
+# Oracle evaluation depth: 0-ply, from the paper's section "Evaluation protocol", paragraph
+# "Oracle".
+plies = 0
+# Base seed of the round-robin and the dice bank. Chosen for this study; it is the project's
+# global seed (README, Pinning section).
+seed = 20260628
+# Agent pinned at Elo 0. From the paper's appendix "Validity of the oracle rating", paragraph
+# "Anchored round-robin" (pubeval pinned at 0).
+anchor = "pubeval"
+# Kendall tau at or above which the report calls the agreement strong (and, with a positive
+# slope, says PR validates). Chosen for this study.
+tau_strong = 0.8
+# Kendall tau at or above which the report calls the agreement moderate. Chosen for this study.
+tau_moderate = 0.5
+
+# Settings of the equal-games recount of resolved cluster pairs
+# (python -m active_oracle_evaluation.experiments.equal_games).
+# The competitive cluster and the multiplicity level come from the validity_intervals experiment.
+
+[equal_games]
+# Bootstrap replicates: the paper's appendix "Validity of the oracle rating", paragraph "Anchored
+# round-robin" ("2,000 replicates"). Must equal the validity_intervals setting for the full-data
+# check.
+n_boot = 2000
+# Bootstrap seed. Chosen for this study; must equal the validity_intervals seed for the
+# full-data check.
+seed = 20260813
+# Number of random half-samples of the trials. Chosen for this study.
+halves = 20
+# Seed of the random half-samples. Chosen for this study.
+halves_seed = 20260910
+# Games per pairing in the anchored-Elo round-robin: the paper's results subsection "Oracle regret
+# predicts head-to-head play, but less well among near-tied agents", and appendix "Validity of the
+# oracle rating", paragraph "Anchored round-robin".
+elo_games_per_pairing = 60
+# Percentiles of the bootstrap interval (a 95% interval): the paper's results subsection "Oracle
+# regret predicts head-to-head play, but less well among near-tied agents" ("95% intervals").
+interval_percentiles = [2.5, 97.5]
+# Largest allowed absolute difference between the full-data intervals and the stored ones.
+# Chosen for this study.
+control_tolerance = 1e-6
+# Normal quantile of the Wilson 95% interval on each cluster pair's head-to-head win rate: the
+# paper's appendix "Validity of the oracle rating", paragraph "Anchored round-robin" ("Wilson 95%
+# interval"), and appendix "Statistical protocol: derivations and definitions" (win rates carry
+# Wilson score intervals).
+wilson_z = 1.96
+
+# Settings of the estimator baselines at a matched label budget
+# (python -m active_oracle_evaluation.experiments.estimator_baselines).
+
+[estimator_baselines]
+# Label budgets K: the paper's appendix "Experimental protocol", paragraph "Frozen decision suite
+# and active selection" (K in {50, 100, 250, 500, 1000}).
+ks = [50, 100, 250, 500, 1000]
+# Replicate draws per (estimator, K): the paper's appendix "Statistical protocol: derivations and
+# definitions", caption of the estimator table (estimators of the full-suite 2-ply PR) ("over 200
+# draws per budget").
+seeds = 200
+# Uniform floor of the active design: the paper's appendix "Experimental protocol", paragraph
+# "Frozen decision suite and active selection" (epsilon = 0.1).
+eps = 0.1
+# Seed of draw s is draw_seed_base + s, shared by the uniform, PPS and LURE draws.
+# Chosen for this study.
+draw_seed_base = 10000
+# Seed of the sequential-halving run of draw s is halving_seed_base + s. Chosen for this study.
+halving_seed_base = 20000
+# Lower clip of the importance in the LURE proposal and in sequential halving, which keeps
+# every proposal weight positive. Chosen for this study.
+importance_floor = 1e-12
+# Agents left out of the predictor-correlation range in the report. Chosen for this study.
+untrained_agents = ["heuristic", "random"]
+# Estimator whose RMSE at the largest K the saving is measured against: the paper's appendix
+# "Statistical protocol: derivations and definitions", caption of the estimator table (estimators of
+# the full-suite 2-ply PR) ("uniform sampling's RMSE at 1,000 labels").
+saving_baseline = "classical"
+
+# Settings of the estimator interval-coverage experiment
+# (python -m active_oracle_evaluation.experiments.estimator_interval_coverage).
+
+[estimator_interval_coverage]
+# Draw counts per (estimator, K). 200 is the draw count of the estimator table (estimators of the
+# full-suite 2-ply PR) in the paper's appendix "Statistical protocol: derivations and definitions"
+# (caption: 200 draws per budget), and the control compares the first draw count with that table's
+# CSVs. 1000 is chosen for this study; the 90.5% cluster coverage in the same appendix, paragraph
+# "Estimator baselines at matched label budget", comes from it.
+seeds = [200, 1000]
+# Label budgets K. The same budgets as the estimator_baselines --ks default; chosen for this study.
+# The estimator table in the paper's appendix "Statistical protocol: derivations and definitions"
+# reports K = 1000.
+ks = [50, 100, 250, 500, 1000]
+# Uniform floor of the active design: the eval_select default (DEFAULT_EPS), chosen for this
+# study.
+eps = 0.1
+# Normal quantile of the 95% intervals. The paper's intervals are nominal 95% (appendix "Statistical
+# protocol: derivations and definitions", paragraph "Estimator baselines at matched label budget").
+z_95 = 1.96
+# Budget shown in the summary. From the estimator table in the paper's appendix "Statistical
+# protocol: derivations and definitions" (at 1,000 labels).
+report_k = 1000
+# Estimators shown in the summary; the JSON holds all of them. Chosen for this study.
+report_estimators = ["classical", "ht_active", "lure_active", "ppi_plus"]
+# The competitive cluster: the six strongest agents, all eight without random and heuristic. From
+# the paper's introduction (the term "competitive cluster") and appendix "Statistical protocol:
+# derivations and definitions", paragraph "Estimator baselines at matched label budget" (on the
+# cluster).
+cluster_agents = ["pubeval", "v1", "v2", "ppo", "az", "distilled"]
+
+# Settings of the XG match export (python -m active_oracle_evaluation.experiments.export_xg_match).
+
+[export_xg_match]
+# Number of suite games to export. From the paper: appendix "Validity of the oracle rating",
+# paragraph "Second engine", and the table of PR under GNU Backgammon and eXtreme Gammon ("60
+# self-play games").
+n = 60
+# Seed of the decision suite. Chosen for this study; it is the project's global seed, shared with
+# build_suite.
+seed = 20260628
+# Self-play agent that generates the games. Chosen for this study; it matches the suite's sampler.
+sampler = "heuristic"
+# Cap on plies per self-play game. Chosen for this study; it equals build_suite's max_plies, which
+# the replay must match.
+max_plies = 400
+
+# Settings of the label-efficiency experiment
+# (python -m active_oracle_evaluation.experiments.label_efficiency).
+
+[label_efficiency]
+# Label budgets K: the paper's appendix "Experimental protocol", paragraph "Frozen decision suite
+# and active selection" ("K in {50, 100, 250, 500, 1000}"), and the label-efficiency figure in the
+# results subsection "Active selection orders the competitive cluster from fewer labels".
+ks = [50, 100, 250, 500, 1000]
+# Draws per design and budget for the 0-ply run of the paper's the label-efficiency figure and of
+# the table of mean Kendall tau under plain-mean and Horvitz-Thompson ranking. The 2-ply run uses 20
+# draws (appendix "Experimental protocol", paragraph "Oracle depth"); scripts/analyze.sh sets it
+# with --seeds 20.
+seeds = 200
+# Bootstrap replicates for the mean per-agent PR interval width. Chosen for this study.
+ci_boot = 300
+# Selection designs, uniform ("random") first: the paper's appendix "Experimental protocol",
+# paragraph "Frozen decision suite and active selection" (four rules), and the results subsection
+# "Active selection orders the competitive cluster from fewer labels".
+strategies = ["random", "phase_balanced", "disagreement", "active_rank"]
+# Competitive cluster, the six agents other than the heuristic and random players: caption of the
+# paper's the label-efficiency figure.
+cluster = ["pubeval", "v1", "v2", "ppo", "az", "distilled"]
+# Cluster pairs that share a tier: the paper's results subsection "Active selection orders the
+# competitive cluster from fewer labels" ("the four pairs of cluster agents that share a tier"); the
+# pairs come from the panel tiers of the agent-panel figure of rank intervals.
+tight_pairs = [["v2", "ppo"], ["pubeval", "v2"], ["pubeval", "ppo"], ["v1", "distilled"]]
+# Cluster Kendall tau levels of the labels-to-threshold table. Chosen for this study.
+tau_thresholds = [0.9, 0.95]
+# Percentiles of the band over draws: caption of the paper's the label-efficiency figure ("the
+# 2.5th-97.5th percentiles over 200 random draws").
+band_percentiles = [2.5, 97.5]
+
+# Settings of the label-efficiency robustness checks
+# (python -m active_oracle_evaluation.experiments.label_efficiency_robustness).
+
+[label_efficiency_robustness]
+# Label budgets K. Paper: appendix "Experimental protocol", paragraph "Frozen decision suite and
+# active selection": K in {50, 100, 250, 500, 1000}.
+ks = [50, 100, 250, 500, 1000]
+# Draws per budget (seeds 0 .. seeds - 1). Paper: appendix "Experimental protocol", paragraph
+# "Frozen decision suite and active selection", and the table of mean Kendall tau under plain-mean
+# and Horvitz-Thompson ranking: 200 draws per budget.
+seeds = 200
+# Selection designs of the held-out-agent check. A "_plain" suffix ranks by the plain subset mean
+# instead of Horvitz--Thompson PR. Chosen for this study; the paper reports loao_disagreement
+# against uniform (appendix "Experimental protocol", paragraph "Held-out agents").
+designs = [
+    "loao_disagreement",
+    "uniform",
+    "disagreement_all",
+    "phase_balanced",
+    "phase_balanced_plain",
+    "loao_disagreement_plain",
+]
+# Pairs of designs compared draw by draw, as [first, second]. Chosen for this study.
+pairs = [
+    ["loao_disagreement", "uniform"],
+    ["loao_disagreement", "disagreement_all"],
+    ["disagreement_all", "uniform"],
+    ["phase_balanced", "uniform"],
+    ["phase_balanced_plain", "uniform"],
+    ["loao_disagreement_plain", "uniform"],
+]
+# The competitive cluster. Paper: caption of the label-efficiency figure: the six agents other than
+# the heuristic and random players.
+cluster = ["pubeval", "v1", "v2", "ppo", "az", "distilled"]
+# Largest absolute difference from the label_efficiency held-out CSV at which the held-out
+# control counts as reproduced. Chosen for this study.
+control_tolerance = 1e-6
+
+# Selector strategy of each design that does not depend on the held-out agent.
+# Chosen for this study.
+[label_efficiency_robustness.shared_strategy]
+uniform = "random"
+disagreement_all = "disagreement"
+phase_balanced = "phase_balanced"
+
+# Settings of the lineage drift comparison
+# (python -m active_oracle_evaluation.experiments.lineage_drift).
+
+[lineage_drift]
+# Seed of the freshly initialized network that gives the cosine a scale. Chosen for this study;
+# the paper does not report this baseline.
+baseline_seed = 0
+# Minimum number of legal moves for a suite position to count in the move agreement. Chosen for this
+# study: a position with one legal move cannot show disagreement. With 2 the count is the
+# 2,400-decision suite of the paper's appendix "Agent configurations", paragraph "Shared
+# initialization".
+min_legal_moves = 2
+# Agent whose moves the others are compared with. From the paper: appendix "Agent configurations",
+# paragraph "Shared initialization" ("the outcome-head network").
+reference_agent = "v2"
+# Agents that start from the reference network. Chosen for this study; the paper reports v2init, ppo
+# and az75 in appendix "Agent configurations", paragraph "Shared initialization".
+lineage_agents = ["v2init", "ppo", "az25", "az50", "az75"]
+# Agents trained separately from the reference network. Chosen for this study; the paper reports
+# newbest as "an unrelated agent" in appendix "Agent configurations", paragraph "Shared
+# initialization", and in the results subsection "The rate of large errors separates near-tied
+# agents, and all agents err more in contact".
+outside_agents = ["newbest", "pubeval", "v1", "dxlarge", "dlarge", "heuristic"]
+# Checkpoints whose recorded training metadata is printed. Chosen for this study.
+provenance_checkpoints = ["policy_value_v2init", "ppo", "az75"]
+
+# Tensor-by-tensor comparisons, in print order. Chosen for this study; the paper reports the PPO
+# trunk cosine (appendix "Agent configurations", paragraph "Shared initialization"). When
+# outcome_to_policy_value is true, the reference is an OutcomeMLP and its tensor names are mapped
+# onto the PolicyValueMLP names.
+[[lineage_drift.comparisons]]
+label = "v2 -> policy_value_v2init"
+reference = "v2"
+target = "policy_value_v2init"
+outcome_to_policy_value = true
+
+[[lineage_drift.comparisons]]
+label = "v2 -> ppo"
+reference = "v2"
+target = "ppo"
+outcome_to_policy_value = true
+
+[[lineage_drift.comparisons]]
+label = "v2init -> az25"
+reference = "policy_value_v2init"
+target = "az25"
+outcome_to_policy_value = false
+
+[[lineage_drift.comparisons]]
+label = "v2init -> az50"
+reference = "policy_value_v2init"
+target = "az50"
+outcome_to_policy_value = false
+
+[[lineage_drift.comparisons]]
+label = "v2init -> az75"
+reference = "policy_value_v2init"
+target = "az75"
+outcome_to_policy_value = false
+
+[[lineage_drift.comparisons]]
+label = "v2 -> az75"
+reference = "v2"
+target = "az75"
+outcome_to_policy_value = true
+
+# Settings of the per-decision PR difference of the duplicate-dice measurement pair
+# (python -m active_oracle_evaluation.experiments.measurement_pair).
+
+[measurement_pair]
+# Bootstrap replicates. Chosen for this study.
+n_boot = 10000
+# Bootstrap seed. Chosen for this study.
+seed = 0
+# Two-sided 95% normal quantile z of the sample-size relation: the paper's appendix "Statistical
+# protocol: derivations and definitions", paragraph "Sample-size relation" (written there as 1.96).
+z = 1.959963984540054
+# Percentiles of the bootstrap interval (a 95% interval): the paper's appendix "Statistical
+# protocol: derivations and definitions", paragraph "Clustered bootstrap" ("2.5th-97.5th
+# percentiles").
+interval_percentiles = [2.5, 97.5]
+# Mean paired points-per-game difference of the pair, scored by game outcome: the paper's appendix
+# "Experimental protocol", paragraph "Measurability experiment" ("-0.246 points per game"), and the
+# results subsection "Per-decision scoring needs fewer trials than duplicate-dice outcomes".
+outcome_diff = 0.2460
+# Paired SD of the points-per-game difference, per duplicate-dice trial: the paper's appendix
+# "Experimental protocol", paragraph "Measurability experiment" ("a paired one of 1.0040"), and
+# appendix "Statistical protocol: derivations and definitions", paragraph "Sample-size relation".
+outcome_sd = 1.0040
+# Unpaired SD of the points-per-game outcome, per game: the paper's appendix "Experimental
+# protocol", paragraph "Measurability experiment" ("unpaired standard deviation of 1.4893").
+outcome_sd_unpaired = 1.4893
+
+# Settings of the Nash-averaging experiment
+# (python -m active_oracle_evaluation.experiments.nash_averaging).
+# The paper names Nash averaging in appendix "Validity of the oracle rating", paragraph "Panel
+# composition", and the seven-agent, 15,000-games-per-pairing round-robin it reads in paragraph
+# "Transitivity and a reversal"; both come from the data file, not from these settings.
+
+[nash_averaging]
+# PR = 500 times the mean equity lost per decision; the paper's section "Evaluation protocol"
+# (paragraph "Rating", and line 8 of the algorithm "Performance Rating on a frozen decision suite").
+pr_scale = 500.0
+# Decimals of PR in the report, as the paper prints PR; chosen for this study.
+pr_decimals = 1
+
+# Maximum-entropy equilibrium solver (feasibility LP, then entropy ascent). Every value is
+# chosen for this study.
+# Largest (A p)_i that still counts as an equilibrium.
+feasibility_tol = 1e-9
+# Entropy-ascent iterations, step size and stopping change (max absolute change of p).
+ascent_iterations = 2000
+ascent_step = 1e-3
+ascent_convergence = 1e-12
+# Added inside the logarithm so that zero mass stays finite.
+log_epsilon = 1e-300
+# Agents with more equilibrium mass than this count as the support.
+support_threshold = 1e-6
+# Tolerance of the antisymmetry check on the advantage matrix.
+antisymmetry_atol = 1e-12
+
+# Clone cells (each agent duplicated in turn). The duplicate splits clone_games evenly with its
+# original, the games per pairing of the round-robin (appendix "Validity of the oracle rating",
+# paragraph "Transitivity and a reversal": 15,000 games per pairing).
+clone_games = 15000
+# Bradley-Terry MM fit of the clone cells: iterations and stopping change of log-strength;
+# chosen for this study.
+bt_iterations = 2000
+bt_convergence = 1e-12
+# Agent pinned at 0 Elo; the paper's sections "Related work" and "Evaluation protocol" anchor Elo to
+# pubeval. The fallback, pinned when pubeval is the duplicated agent, is chosen for this study.
+anchor = "pubeval"
+anchor_fallback = "v2"
+
+[oracle_depth]
+# Shared positions per oracle. Chosen for this study.
+n = 500
+# Suite seed. The release's global seed (README, Pinning section); paper: appendix "Reproducibility,
+# release and compute", paragraph "Released code and data" (every run is seeded).
+seed = 20260628
+# Agent whose self-play generates the positions. Chosen for this study.
+sampler = "heuristic"
+# GNU Backgammon depths in the oracle ladder, in ply. Paper: appendix "Experimental protocol",
+# paragraph "Common setup and harness" (scored at 0-ply, re-scored at 2-ply to check robustness).
+gnubg_plies = [0, 2]
+# Kendall tau the strong oracles must reach. Paper: results subsection "Oracle regret separates the
+# panel into five tiers" (the agreement of 0.9 required of a second reference).
+tau_robust = 0.9
+# The pubeval tau must lie more than this below the strong-strong tau. Chosen for this study.
+pubeval_margin = 0.1
+
+# Settings of the anchored round-robin with the oracle in the pool
+# (python -m active_oracle_evaluation.experiments.oracle_pool_elo).
+
+[oracle_pool_elo]
+# Agent specs of the nine-agent pool, built-in agents by name and checkpoints as label:path relative
+# to the repo root. From the paper's appendix "Validity of the oracle rating", paragraph "Oracle
+# strength in play" (pubeval, AlphaZero, the outcome-head TD-lambda agent, the engine at 0-, 1- and
+# 2-ply, the two searches and the external TD network).
+agents = [
+    "pubeval",
+    "az:models/az75.pt",
+    "v2net:models/v2.pt",
+    "gnubg:0",
+    "gnubg:1",
+    "gnubg:2",
+    "search2:models/champion.pt",
+    "sel3:models/champion.pt",
+    "puretd:models/puretd.pt",
+]
+# Duplicate-dice pairs per shard. The product pairs_per_shard x shards = 60 pairs = 120 games per
+# pairing (4,320 in all) is from the paper's appendix "Validity of the oracle rating", paragraph
+# "Oracle strength in play"; the split into 15 x 4 is chosen for this study.
+pairs_per_shard = 15
+# Independent dice-bank blocks per pairing. See pairs_per_shard.
+shards = 4
+# Worker processes for play and PR scoring. Chosen for this study.
+workers = 14
+# Base seed of the dice banks, the agents and the Elo bootstrap. Chosen for this study.
+seed = 20260720
+# Stride between the dice-bank seeds of consecutive pairings
+# (bank seed = seed + stride * pairing index + shard). Chosen for this study.
+bank_seed_stride = 1000
+# Oracle depth for PR: 0-ply. From the paper's appendix "Validity of the oracle rating", paragraph
+# "Oracle strength in play" ("the 0-ply evaluation that scores the suite").
+oracle_plies = 0
+# Agent pinned at Elo 0. From the paper's appendix "Validity of the oracle rating", paragraph
+# "Anchored round-robin" (pubeval pinned at 0).
+anchor = "pubeval"
+# Comma list of the agents for the strong-tier tau. Chosen for this study; the paper's appendix
+# "Validity of the oracle rating", paragraph "Oracle strength in play", describes six of the nine
+# members as one tier.
+strong_tier = "gnubg0,gnubg1,gnubg2,search2,sel3,puretd"
+# Trial-level bootstrap resamples for the Elo intervals. Chosen for this study.
+boots = 1000
+# Bradley-Terry iterations per bootstrap refit. Chosen for this study.
+bootstrap_iterations = 200
+# Percentiles of the pivotal bootstrap interval (a 95% interval). Chosen for this study.
+interval_percentiles = [2.5, 97.5]
+
+# Settings of wildbg as a tenth agent in the nine-agent anchored-Elo pool
+# (python -m active_oracle_evaluation.experiments.oracle_pool_wildbg).
+
+[oracle_pool_wildbg]
+# The nine agents of the base pool, in the order of its labels: the paper's appendix "Validity of
+# the oracle rating", paragraph "Oracle strength in play" (pubeval, AlphaZero, the outcome-head
+# TD-lambda agent, the engine at 0-, 1- and 2-ply, the two searches and the external TD network).
+agents = [
+    "pubeval",
+    "az:models/az75.pt",
+    "v2net:models/v2.pt",
+    "gnubg:0",
+    "gnubg:1",
+    "gnubg:2",
+    "search2:models/champion.pt",
+    "sel3:models/champion.pt",
+    "puretd:models/puretd.pt",
+]
+# Duplicate-dice pairs per shard; 15 x 4 shards gives the 60 trials per pairing of the paper's
+# appendix "Validity of the oracle rating", paragraph "An agent from outside the lineage".
+pairs_per_shard = 15
+# Independent dice-bank blocks per pairing: the paper's appendix "Validity of the oracle rating",
+# paragraph "An agent from outside the lineage" (60 trials, 1,080 games over nine pairings).
+shards = 4
+# Worker processes for play and scoring. Chosen for this study (compute only).
+workers = 14
+# Oracle depth for wildbg's PR, the 0-ply protocol: the paper's appendix "Validity of the oracle
+# rating", paragraph "An agent from outside the lineage".
+plies = 0
+# Game-level binomial bootstrap resamples for the Elo intervals. Chosen for this study.
+boots = 2000
+# Bradley-Terry iterations inside each bootstrap fit. Chosen for this study.
+bootstrap_iterations = 200
+# Agent pinned to Elo 0: the paper's appendix "Validity of the oracle rating", paragraph "Anchored
+# round-robin" ("pubeval pinned at 0").
+anchor = "pubeval"
+# Clip on head-to-head win rates before the log-odds transform. Chosen for this study.
+winrate_clip = 0.02
+# Index of wildbg's first pairing in the dice-bank derivation; the base pool uses 0..35 for its
+# 36 pairings, so wildbg's banks are fresh. Chosen for this study.
+first_pairing_index = 36
+# Bank seed of a job = seed + bank_seed_stride * pairing index + shard. Chosen for this study.
+bank_seed_stride = 1000
+# Agents whose jobs run first, to balance the worker pool (scheduling only). Chosen for this
+# study.
+slow_agents = ["sel3", "search2", "gnubg2"]
+
+# Settings of the paired PR contrasts between agent pairs on the shipped score caches
+# (python -m active_oracle_evaluation.experiments.pair_contrasts).
+
+[pair_contrasts]
+# Bootstrap replicates of each paired interval (paper, appendix "Statistical protocol:
+# derivations and definitions", paragraph "Multiple comparisons and intervals": 2,000).
+n_boot = 2000
+# Bootstrap seed. Chosen for this study; it is the suite seed of the 2,400-decision suite.
+seed = 20260628
+# Contrasts as [cache file in data/decision_suites/, first agent, second agent], first minus
+# second. pubeval against the warm-start network v2init on the 2,400-decision suite and on the
+# panel suite (paper, appendix "Validity of the oracle rating", paragraph "Transitivity and a
+# reversal", and the contrast table of appendix "Statistical protocol: derivations and
+# definitions"); the AlphaZero checkpoints after 25, 50 and 75 iterations (appendix "Phase
+# diagnostics and search ablation", paragraph "Learning curve"); and the same contrasts on the
+# suite re-labelled at 2 ply.
+contrasts = [
+    ["full_suite_scores_0ply_large.npz", "pubeval", "v2init"],
+    ["panel_suite_scores_0ply_large.npz", "pubeval", "v2init"],
+    ["full_suite_scores_0ply_large.npz", "az25", "az50"],
+    ["full_suite_scores_0ply_large.npz", "az50", "az75"],
+    ["full_suite_scores_0ply_large.npz", "az25", "az75"],
+    ["full_suite_scores_2ply_large.npz", "pubeval", "v2init"],
+    ["full_suite_scores_2ply_large.npz", "az25", "az50"],
+    ["full_suite_scores_2ply_large.npz", "az50", "az75"],
+    ["full_suite_scores_2ply_large.npz", "az25", "az75"],
+]
+# Agents whose PR order is reported in each cache below: the AlphaZero learning curve (appendix
+# "Phase diagnostics and search ablation", paragraph "Learning curve": the order at 0 and 2 ply).
+order_agents = ["az25", "az50", "az75"]
+order_caches = ["full_suite_scores_0ply_large.npz", "full_suite_scores_2ply_large.npz"]
+# Decimal places of the printed and tabulated values. Chosen for this study.
+decimals = 2
+
+# Settings of the agent-panel PR table on the paired panel suite
+# (python -m active_oracle_evaluation.experiments.panel_ratings).
+
+[panel_ratings]
+# The eight-agent panel: the agent-panel table in the paper's appendix "Agent configurations".
+agents = [
+    "random",
+    "heuristic",
+    "pubeval",
+    "v1:models/v1.pt",
+    "v2:models/v2.pt",
+    "ppo:models/ppo.pt",
+    "az:models/az75.pt",
+    "distilled:models/distilled.pt",
+]
+# Agents whose self-play supplies the panel suite, the heuristic and the outcome-head agent: the
+# paper's appendix "Experimental protocol", paragraph "Frozen decision suite and active selection".
+samplers = ["heuristic", "v2:models/v2.pt"]
+# Panel suite size, split evenly across the samplers: the paper's appendix "Experimental protocol",
+# paragraph "Frozen decision suite and active selection" ("a separate suite of 1,000 decisions").
+positions = 1000
+# Seed of the suite build, the tie-break RNG of scoring and every bootstrap. Chosen for this
+# study; data/decision_suites/panel_suite_0ply_v1.jsonl records it.
+seed = 20260628
+# Offset between the suite seeds of consecutive samplers (sampler i uses seed + stride * (i + 1)).
+# Chosen for this study.
+sampler_seed_stride = 1000
+# Oracle depth of the ground-truth equities: the paper's appendix "Experimental protocol", paragraph
+# "Common setup and harness" ("We score decisions at 0-ply").
+plies = 0
+# Bootstrap replicates of every interval and p-value: the paper's appendix "Statistical protocol:
+# derivations and definitions", paragraph "Multiple comparisons and intervals" ("over 2,000
+# replicates").
+n_boot = 2000
+# Suite label stored in the metadata of each dumped record. Chosen for this study; it matches
+# the label inside data/decision_suites/panel_suite_0ply_v1.jsonl.
+suite_label = "panel_1000"
+# Other tie-break draws under which every agent is re-scored on the same suite (seeds seed + 1 to
+# seed + repeat_draws): the paper's appendix "Agent configurations", paragraph "Repeat
+# evaluations". Chosen for this study.
+repeat_draws = 5
+
+# Settings of the game-clustered per-phase intervals
+# (python -m active_oracle_evaluation.experiments.phase_intervals).
+
+[phase_intervals]
+# Game-clustered bootstrap replicates, shared by every statistic. Chosen for this study.
+n_boot = 10000
+# Bootstrap seed. The decision-level replicates of the design effect use seed + 1.
+# Chosen for this study.
+boot_seed = 0
+# Threshold on the Holm-adjusted p of each agent's worst contact phase against its runner-up.
+# Chosen for this study.
+holm_alpha = 0.05
+# The contact phases: the paper's appendix "Phase diagnostics and search ablation", paragraph
+# "Phases" ("The last three are the contact phases"), and the results subsection "The rate of large
+# errors separates near-tied agents, and all agents err more in contact".
+contact_phases = ["contact", "holding", "blitz_backgame"]
+# The other three phases: the paper's appendix "Phase diagnostics and search ablation", paragraph
+# "AlphaZero's lead by phase" ("the opening, race and bear-off").
+easy_phases = ["opening", "race", "bearoff"]
+# The next tier, averaged without weights: the paper's appendix "Phase diagnostics and search
+# ablation", paragraph "AlphaZero's lead by phase"
+# ("pubeval, the outcome-head TD-λ agent and PPO").
+cluster = ["pubeval", "v2", "ppo"]
+# The agent whose lead is measured (AlphaZero): the paper's appendix "Phase diagnostics and search
+# ablation", paragraph "AlphaZero's lead by phase".
+focus = "az"
+
+# Settings of the Monte Carlo playout check of the agent ranking
+# (python -m active_oracle_evaluation.experiments.rollout_check).
+
+[rollout_check]
+# Suite positions scored by the playout: 80, from the paper's appendix "Validity of the oracle
+# rating", paragraph "Monte Carlo playout check".
+positions = 80
+# Playouts per candidate afterstate: 96, from the same paragraph.
+playouts = 96
+# Position-sampling seed; chosen for this study.
+sample_seed = 12345
+# Dice seed of the playouts (playout i uses seed + i); chosen for this study.
+seed = 0
+# PR = 500 x mean equity loss per unforced decision, from the paper's section "Evaluation protocol",
+# paragraph "Rating" (the GNU Backgammon / eXtreme Gammon PR convention).
+pr_scale = 500.0
+
+# Settings of the suite scorer (python -m active_oracle_evaluation.experiments.score_agent).
+
+[score_agent]
+# Base seed of stochastic agents; record i uses the key "<seed>:<i>". The keying follows line 2 of
+# the algorithm "Performance Rating on a frozen decision suite" in the paper's section "Evaluation
+# protocol" (Rng(s:i)). The value 0 is chosen for this study.
+seed = 0
+# Bootstrap replicates of the clustered interval (0 skips it). Chosen for this study; the clustered
+# bootstrap is described in the paper's appendix "Statistical protocol: derivations and
+# definitions", paragraph "Clustered bootstrap".
+boot = 2000
+# Seed of the bootstrap resampler. Chosen for this study.
+boot_seed = 0
+# Coverage of the percentile interval. From the paper: 95% intervals (appendix "Statistical
+# protocol: derivations and definitions", paragraph "Clustered bootstrap"; section "Evaluation
+# protocol", paragraph "Statistics").
+level = 0.95
+
+# Settings of the suite score cache
+# (python -m active_oracle_evaluation.experiments.score_panel_cache).
+
+[score_panel_cache]
+# Agent specs of the eight-agent panel, scored when --agents is not given. From the paper's agent
+# panel (the agent-panel table in appendix "Agent configurations"; the agent-panel figure in the
+# results subsection "Oracle regret separates the panel into five tiers"). Spec paths are relative
+# to the repo root.
+panel_agents = [
+    "random",
+    "heuristic",
+    "pubeval",
+    "v1:models/v1.pt",
+    "v2:models/v2.pt",
+    "ppo:models/ppo.pt",
+    "az:models/az75.pt",
+    "distilled:models/distilled.pt",
+]
+# Agent specs of the 18-agent pool, the panel plus ten further checkpoints of the same lineage,
+# scored with --pool large. From the paper's appendix "Validity of the oracle rating", paragraph
+# "Transitivity and a reversal". The order is the order of names in
+# full_suite_scores_0ply_large.npz.
+large_agents = [
+    "random",
+    "heuristic",
+    "pubeval",
+    "v1:models/v1.pt",
+    "v2:models/v2.pt",
+    "v2init:models/policy_value_v2init.pt",
+    "ppo:models/ppo.pt",
+    "az25:models/az25.pt",
+    "az50:models/az50.pt",
+    "az75:models/az75.pt",
+    "dlarge:models/policy_value_distill_large_20260619.pt",
+    "dphasecap:models/policy_value_distill_phasecap_20260619.pt",
+    "dxlarge:models/policy_value_distill_xlarge_20260619.pt",
+    "rblended:models/policy_value_rollout_blended.pt",
+    "rdisag:models/policy_value_rollout_disagreement.pt",
+    "rscaled:models/policy_value_rollout_scaled.pt",
+    "searchonly:models/policy_value_searchonly_20260619.pt",
+    "newbest:models/new_best_outcome.pt",
+]
+# Seed of the per-record tie-break streams; record i uses random.Random(f"{seed}:{i}").
+# Chosen for this study.
+tie_break_seed = 0
+# Decimal places of the PR values in the sidecar and the printed summary. Chosen for this study.
+pr_decimals = 1
+
+# Settings of the search ablation: the AlphaZero network with and without play-time MCTS
+# (python -m active_oracle_evaluation.experiments.search_ablation).
+
+[search_ablation]
+# Name of the no-search condition inside the score cache; the cache's "az" row is the az75
+# network played as a plain afterstate agent. Chosen for this study.
+no_search_agent = "az"
+# MCTS simulation counts of the with-search conditions: the paper's appendix "Phase diagnostics and
+# search ablation", paragraph "Search ablation" (100 simulations and the 200 used in training).
+sims = [100, 200]
+# PUCT exploration constant: the hyperparameter table in the paper's appendix "Agent configurations"
+# ("AlphaZero c_puct 1.5").
+c_puct = 1.5
+# Bootstrap replicates of every interval and p-value. Chosen for this study.
+n_boot = 10000
+# Seed of the game-clustered bootstrap. Chosen for this study.
+boot_seed = 0
+# Easy and contact phase groups of the gap contrast: the paper's appendix "Phase diagnostics and
+# search ablation", paragraph "Search ablation" ("over the opening, race and bear-off against ...
+# over the contact phases").
+easy_phases = ["opening", "race", "bearoff"]
+contact_phases = ["contact", "holding", "blitz_backgame"]
+
+# Settings of the subset selector (python -m active_oracle_evaluation.experiments.select_positions).
+
+[select_positions]
+# Seed of every selection draw. Chosen for this study; it is the project's global seed
+# (README, Pinning section). The paper does not state it.
+seed = 20260628
+# Budgets K. From the paper: K in {50, 100, 250, 500, 1000} (appendix "Experimental protocol",
+# paragraph "Frozen decision suite and active selection").
+ks = [50, 100, 250, 500, 1000]
+# Steering source of the active-rank rule: "skyline" steers on the suite's own 0-ply losses. From
+# the paper: active-rank is a skyline (appendix "Experimental protocol", paragraph "Frozen decision
+# suite and active selection"; appendix "Statistical protocol: derivations and definitions",
+# paragraph "Horvitz-Thompson under active selection").
+importance = "skyline"
+# Budget whose phase mix is compared with the pool; if it is not in ks, the middle element of
+# ks is used. Chosen for this study.
+phase_mix_k = 250
+
+# Settings of the paired tail-statistic intervals
+# (python -m active_oracle_evaluation.experiments.tail_differences).
+
+[tail_differences]
+# Agent pairs compared, first minus second: the outcome-head TD-lambda agent (v2) against PPO, and
+# AlphaZero (az) against each of them (paper, appendix "Phase diagnostics and search ablation",
+# paragraph "Tail risk").
+agent_pairs = [["v2", "ppo"], ["az", "v2"], ["az", "ppo"]]
+# Regret thresholds, in equity, of the catastrophic-error rate. 0.05 is the paper's threshold
+# (results subsection "The rate of large errors separates near-tied agents, and all agents err more
+# in contact"; appendix "Phase diagnostics and search ablation", caption of the tail-statistics
+# table). 0.10 and 0.20 are chosen for this study; with the two percentiles they give the fifteen
+# comparisons of that appendix's paragraph "Tail risk".
+cat_thresholds = [0.05, 0.10, 0.20]
+# Percentiles of the regret distribution compared (paper, appendix "Phase diagnostics and search
+# ablation", paragraph "Tail risk", and the tail-statistics table). The last one is the percentile
+# named in the printed tail-size note.
+tail_percentiles = [95, 99]
+# Share of decisions above the last percentile, used only for the printed tail-size note.
+# Chosen for this study.
+tail_note_fraction = 0.01
+# Paired bootstrap replicates (paper, appendix "Phase diagnostics and search ablation", paragraph
+# "Tail risk": "paired bootstrap of 10,000 replicates").
+n_boot = 10000
+# Bootstrap seed. Chosen for this study.
+seed = 0
+
+# Settings of the per-agent tail statistics and per-phase regret tables
+# (python -m active_oracle_evaluation.experiments.tail_regret).
+
+[tail_regret]
+# Regret thresholds, in equity, of the catastrophic-error rate. 0.05 is the paper's threshold
+# (results subsection "The rate of large errors separates near-tied agents, and all agents err more
+# in contact"; appendix "Phase diagnostics and search ablation", caption of the tail-statistics
+# table, column Cat.). 0.10 and 0.20 are chosen for this study.
+catastrophic_thresholds = [0.05, 0.10, 0.20]
+# Game-clustered bootstrap replicates of the per-phase mean intervals. Chosen for this study.
+n_boot = 2000
+# Seed of the game-clustered bootstrap. Chosen for this study.
+boot_seed = 0
+# Decision-level bootstrap replicates of the interval on each agent's p95. Chosen for this study.
+p95_n_boot = 2000
+# Seed of the decision-level p95 bootstrap. Chosen for this study.
+p95_seed = 0
+# Two-sided level of every percentile interval (95% intervals). Chosen for this study.
+alpha = 0.05
+# Two agents have a similar mean when their mean regret differs by at most this many equity
+# units (0.002 equity is 1 PR point). Used only in the report. Chosen for this study.
+similar_mean_tol = 0.002
+
+# Settings of the transfer of the per-decision saving to closer pairs
+# (python -m active_oracle_evaluation.experiments.transportability).
+
+[transportability]
+# Seed of the dice bank of the replayed round-robin. Chosen for this study; it equals the seed
+# of the round-robin whose per-decision losses are cached in
+# data/round_robins/validity_pr_decision_losses.npz, so the replayed games are the scored games.
+seed = 20260628
+# Duplicate-dice trials per pairing: the paper's appendix "Validity of the oracle rating", paragraph
+# "Anchored round-robin" ("60 duplicate-dice trials (120 games) per pairing"), and appendix
+# "Experimental protocol", paragraph "Transfer of the saving to closer pairs" ("60 duplicate-dice
+# trials").
+pairs = 60
+# PR is 500 times the mean equity lost per unforced decision: the paper's section "Evaluation
+# protocol", paragraph "Rating", and the opening paragraph of appendix "Statistical protocol:
+# derivations and definitions".
+pr_per_equity = 500.0
+# The eight agents of the anchored round-robin, in its pairing order: the paper's appendix "Validity
+# of the oracle rating", paragraph "Anchored round-robin" ("all eight agents"). Checkpoint paths are
+# relative to the repo root.
+agent_specs = [
+    "random",
+    "heuristic",
+    "pubeval",
+    "v1:models/v1.pt",
+    "v2:models/v2.pt",
+    "ppo:models/ppo.pt",
+    "az:models/az75.pt",
+    "distilled:models/distilled.pt",
+]
+# The competitive cluster, the six agents other than random and heuristic: the paper's appendix
+# "Experimental protocol", paragraph "Transfer of the saving to closer pairs" ("the fifteen pairs of
+# the competitive cluster").
+cluster = ["pubeval", "v1", "v2", "ppo", "az", "distilled"]
+# The round-robin pairing that uses the measured pair's two checkpoints (outcome-head TD-lambda
+# against AlphaZero): the paper's appendix "Experimental protocol", paragraph "Measurability
+# experiment" and paragraph "Transfer of the saving to closer pairs" ("the measured pair sits at 7.1
+# over its 60 round-robin trials").
+measurement_pairing = "v2|az"
+# Pairs with |ppg gap| above this threshold count as measurable. Chosen for this study. The paper
+# states the scope as 0.04 ppg or larger (appendix "Experimental protocol", paragraph "Transfer of
+# the saving to closer pairs"); both thresholds select the same 27 pairs, because no pair has a gap
+# between 0.0083 and 0.042.
+measurable_ppg = 0.02
+# Smallest size of the closest and farthest groups in the variance-reduction comparison (the
+# group size is max(this, number of pairs // 4)). Chosen for this study.
+close_far_group_min = 3
+
+# Settings of the validity-table bootstrap intervals
+# (python -m active_oracle_evaluation.experiments.validity_intervals).
+
+[validity_intervals]
+# Agent specs of the eight-agent panel: built-in agents by name, checkpoints as label:path relative
+# to the repo root. From the paper's appendix "Validity of the oracle rating", paragraph "Anchored
+# round-robin" (all eight agents) and the table of PR and anchored Elo of the eight agents.
+agent_specs = [
+    "random",
+    "heuristic",
+    "pubeval",
+    "v1:models/v1.pt",
+    "v2:models/v2.pt",
+    "ppo:models/ppo.pt",
+    "az:models/az75.pt",
+    "distilled:models/distilled.pt",
+]
+# Agents whose pairwise differences are reported (the competitive cluster, 15 pairs). From the
+# paper's appendix "Validity of the oracle rating", paragraph "Anchored round-robin" ("the cluster's
+# 15 pairs").
+cluster = ["pubeval", "v1", "v2", "ppo", "az", "distilled"]
+# Dice-bank seed of the round-robin replay. Chosen for this study; it is the seed of the
+# elo_validity round-robin (the [elo_validity] table), so the replay matches it.
+dice_seed = 20260628
+# Duplicate-dice trials per pairing. From the paper's appendix "Validity of the oracle rating",
+# paragraph "Anchored round-robin" (60 duplicate-dice trials, 120 games, per pairing).
+pairs = 60
+# Oracle evaluation depth: 0-ply, from the paper's section "Evaluation protocol", paragraph
+# "Oracle".
+plies = 0
+# Bootstrap replicates. From the paper's appendix "Validity of the oracle rating", paragraph
+# "Anchored round-robin" ("95% bootstrap interval (2,000 replicates)").
+boot = 2000
+# Seed of the bootstrap resampling. Chosen for this study.
+bootstrap_seed = 20260813
+# Oracle scoring processes. Chosen for this study; results do not depend on it.
+workers = 6
+# Percentiles of the 95% bootstrap interval. From the paper's appendix "Validity of the oracle
+# rating", paragraph "Anchored round-robin".
+interval_percentiles = [2.5, 97.5]
+# Family-wise (Holm) and false-discovery (Benjamini-Hochberg) level of the multiplicity counts.
+# Chosen for this study.
+alpha = 0.05
+# Largest allowed difference between the Elo refit and the Elo stored in elo_validity.json.
+# Chosen for this study.
+refit_tolerance = 1e-9
+
+# Settings of the XG cross-check (python -m active_oracle_evaluation.experiments.xg_oracle).
+
+[xg_oracle]
+# Agent specs, in the row set of the paper's the table of PR under GNU Backgammon and eXtreme Gammon
+# (appendix "Validity of the oracle rating", paragraph "Second engine"). The az spec is the
+# AlphaZero row, v1 and v2 the TD-lambda scalar and outcome heads.
+agents = [
+    "random",
+    "heuristic",
+    "pubeval",
+    "v1:models/v1.pt",
+    "v2:models/v2.pt",
+    "ppo:models/ppo.pt",
+    "az:models/az75.pt",
+    "distilled:models/distilled.pt",
+]
+# GNU Backgammon depths the XG ranking is compared with. From the paper: the 0-ply and 2-ply columns
+# of the table of PR under GNU Backgammon and eXtreme Gammon (appendix "Validity of the oracle
+# rating").
+gnubg_plies = [0, 2]
+# Performance Rating = mean equity loss per decision times 500. From the paper: section "Evaluation
+# protocol", the PR definition above the algorithm "Performance Rating on a frozen decision suite";
+# it is the XG and GNU Backgammon convention.
+pr_scale = 500
+# Kendall tau at or above which XG counts as agreeing with GNU Backgammon. From the paper: results
+# subsection "Oracle regret separates the panel into five tiers" ("the agreement of 0.9 that we
+# require of a second reference").
+tau_threshold = 0.9
+# Fewest legal afterstates, and fewest XG candidates matched to them, for a decision to count.
+# Chosen for this study (a decision with one option has no equity loss).
+min_candidates = 2
+
+# Settings of the degraded-reference selection experiment
+# (python -m active_oracle_evaluation.experiments.yahtzee_degraded_steering).
+
+[yahtzee_degraded_steering]
+# Games per suite. From the paper: each suite holds the 117,000 decisions of 3,000 games (appendix
+# "Solitaire Yahtzee: exact ground truth", paragraph "Agent panel and suites").
+games = 3000
+# Random draws of the labeled set per budget. From the paper: 200 random draws (appendix "Solitaire
+# Yahtzee: exact ground truth", caption of the Yahtzee label-efficiency figure).
+seeds = 200
+# Seed of the decision suites. Chosen for this study; the same value as the suite seed of
+# yahtzee_reference_quality, so both experiments label the same suites.
+suite_seed = 20260901
+# Seed of the agent panel. Chosen for this study; the default seed of build_panel.
+panel_seed = 20260831
+# Label budgets K. Chosen for this study; the paper quotes K = 32 and K = 512 (appendix "Solitaire
+# Yahtzee: exact ground truth", paragraph "Selection from a weak reference").
+budgets = [8, 16, 32, 64, 128, 256, 512]
+# The near-tied panel. From the paper: optimal, eta = 0.5 and eta = 1 (appendix "Solitaire Yahtzee:
+# exact ground truth", caption of the Yahtzee label-efficiency figure).
+agents = ["optimal", "noisy_s0.5", "noisy_s1"]
+# Noise scales of the degraded reference, after the exact design at sigma = 0. The noise family is
+# from the paper (appendix "Solitaire Yahtzee: exact ground truth", paragraph "Agent panel and
+# suites"); the paper quotes the reference 129 points per game from optimal, sigma = 50 (paragraph
+# "Selection from a weak reference"). The other scales are chosen for this study.
+reference_sigmas = [0.5, 1.0, 2.0, 5.0, 15.0, 50.0]
+# Base of the reference noise seed; scale sigma uses base + round(1000 * sigma). Chosen for
+# this study; the same base as draw 0 of yahtzee_reference_quality --independent, so the
+# reference deficits read from its output describe these references.
+reference_seed_base = 770001
+# Base of the tie-break permutation seed; draw s uses base + s. Chosen for this study.
+jitter_seed_base = 10000
+
+# Settings of the Yahtzee label-efficiency experiment
+# (python -m active_oracle_evaluation.experiments.yahtzee_label_efficiency).
+
+[yahtzee_label_efficiency]
+# Games per suite. From the paper: each suite holds the 117,000 decisions of 3,000 games (appendix
+# "Solitaire Yahtzee: exact ground truth", paragraph "Agent panel and suites").
+games = 3000
+# Random draws of the labeled set per rule and budget. Chosen for this study.
+seeds = 100
+# Seed of the decision suites. Chosen for this study.
+suite_seed = 20260901
+# Seed of the agent panel. Chosen for this study; the default seed of build_panel.
+panel_seed = 20260831
+# Suites, in run order. From the paper: drawn either from optimal play or from a mixture of all nine
+# agents (appendix "Solitaire Yahtzee: exact ground truth", paragraph "Agent panel and suites").
+suites = ["optimal", "mixture"]
+# Selection rules. From the paper: "all three rules we tested" (section "In a solved game, suite
+# regret recovers the ranking but not the magnitudes", paragraph "The ranking is exact; the
+# magnitudes are not").
+rules = ["uniform", "disagreement", "regret_importance"]
+# Label budgets K. From the paper: the budget grows from 8 to 8,192 labels (appendix "Solitaire
+# Yahtzee: exact ground truth", paragraph "The estimand gap").
+budgets = [8, 32, 128, 512, 2048, 8192]
+# Agents left out, which gives the paper's nine-agent panel (appendix "Solitaire Yahtzee: exact
+# ground truth", paragraph "Agent panel and suites"). fixed_order breaks its dice-blind ties
+# differently when it is labelled and when it is priced, so its labels and its deficit describe
+# different policies.
+drop = ["fixed_order"]
+# Selection rule of the leave-one-agent-out check. Chosen for this study.
+loao_rule = "disagreement"
+# Label budget of the leave-one-agent-out check. Chosen for this study.
+loao_budget = 512
+# Base of the tie-break permutation seed; draw s uses base + s. Chosen for this study.
+tie_seed_offset = 10000
+# Base of the tie-break permutation seed in the leave-one-agent-out check. Chosen for this study.
+loao_tie_seed_offset = 20000
+
+# Settings of the exact Yahtzee panel evaluation
+# (python -m active_oracle_evaluation.experiments.yahtzee_panel).
+
+[yahtzee_panel]
+# Seed of the noisy agents; agent eta uses seed + round(1000 * eta). Chosen for this study.
+seed = 20260831
+# Largest allowed |V*(start) - 254.5877|. The anchor is from the paper (appendix "Solitaire Yahtzee:
+# exact ground truth", paragraph "The solved game"); the tolerance is chosen for this study.
+v_star_tolerance = 5e-5
+# Largest allowed |SD of optimal - 59.61|. The anchor is from the paper (appendix "Solitaire
+# Yahtzee: exact ground truth", paragraph "The solved game"); the tolerance is chosen for this
+# study.
+sd_tolerance = 5e-3
+# Largest allowed performance-difference identity error. Chosen for this study; the paper reports
+# the achieved 7.1e-13 (appendix "Solitaire Yahtzee: exact ground truth", paragraph "Check on policy
+# evaluation").
+identity_tolerance = 1e-9
+
+# Settings of the Yahtzee rank-recovery and estimand-gap experiment
+# (python -m active_oracle_evaluation.experiments.yahtzee_rank_recovery).
+
+[yahtzee_rank_recovery]
+# Games per suite. From the paper: each suite holds the 117,000 decisions of 3,000 games (appendix
+# "Solitaire Yahtzee: exact ground truth", paragraph "Agent panel and suites").
+games = 3000
+# Random draws of the labeled set per rule and budget. From the paper: 200 random draws (appendix
+# "Solitaire Yahtzee: exact ground truth", caption of the Yahtzee label-efficiency figure).
+seeds = 200
+# Seed of the decision suites. Chosen for this study.
+suite_seed = 20260901
+# Seed of the agent panel. Chosen for this study; the default seed of build_panel.
+panel_seed = 20260831
+# Label budgets K. From the paper: budgets from 8 up to 8,192 labels (appendix "Solitaire Yahtzee:
+# exact ground truth", paragraph "The estimand gap" and caption of the Yahtzee label-efficiency
+# figure).
+budgets = [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
+# Selection rules. From the paper: the three rules of the section "In a solved game, suite regret
+# recovers the ranking but not the magnitudes", paragraph "The ranking is exact; the magnitudes are
+# not"; regret importance has no phase strata here (appendix "Solitaire Yahtzee: exact ground
+# truth", caption of the Yahtzee label-efficiency figure).
+rules = ["uniform", "disagreement", "regret_importance"]
+# Base of the tie-break permutation seed; draw s uses base + s. Chosen for this study.
+jitter_seed_base = 10000
+# Percentiles of the Kendall tau interval over draws. Chosen for this study.
+tau_percentiles = [2.5, 97.5]
+
+# Named agent subsets for --preset; each also names the output file unless --tag is given.
+[yahtzee_rank_recovery.presets]
+# The nine-agent panel: every agent but fixed_order. From the paper: the panel of nine (section "In
+# a solved game, suite regret recovers the ranking but not the magnitudes"; appendix "Solitaire
+# Yahtzee: exact ground truth", table of true and suite per-decision regret).
+estimand = [
+    "optimal",
+    "noisy_s0.5",
+    "noisy_s1",
+    "noisy_s2",
+    "noisy_s5",
+    "noisy_s15",
+    "noisy_s50",
+    "greedy",
+    "heuristic",
+]
+
+# Settings of the reference-quality experiment
+# (python -m active_oracle_evaluation.experiments.yahtzee_reference_quality).
+
+[yahtzee_reference_quality]
+# Games per suite. From the paper: each suite holds the 117,000 decisions of 3,000 games (appendix
+# "Solitaire Yahtzee: exact ground truth", paragraph "Agent panel and suites").
+games = 3000
+# Seed of the decision suites. Chosen for this study.
+suite_seed = 20260901
+# Seed of the agent panel and of the shared-draw reference. Chosen for this study; the
+# default seed of build_panel.
+panel_seed = 20260831
+# Base of the noise seed of the independent references; draw d at scale sigma uses
+# (base + 1000 * d) + round(1000 * sigma). Chosen for this study.
+indep_seed = 770001
+# Independent noise draws per sigma with --independent. Chosen for this study as the command-line
+# default; the paper reports four draws, run with --draws 4 (appendix "Solitaire Yahtzee: exact
+# ground truth", paragraph "Reference strength and shared error").
+draws = 1
+# Tolerance of the check that a reference's on-policy regret equals its skill gap.
+# Chosen for this study.
+regret_tolerance = 1e-9
+
+# Settings of the Yahtzee trials-to-resolve experiment
+# (python -m active_oracle_evaluation.experiments.yahtzee_trials).
+
+[yahtzee_trials]
+# On-policy games simulated per agent to measure the regret SD. Chosen for this study.
+games = 5000
+# Agents left out of the comparison. Chosen for this study: fixed_order ties almost every
+# option, and the exact evaluator and the simulator break those ties differently.
+exclude = ["fixed_order"]
+# Simulation seed; agent i in panel order uses seed + i. Chosen for this study.
+seed = 20260901
+# Seed of the noisy agents of the panel. Chosen for this study; it must equal the seed of
+# data/yahtzee/yahtzee_panel.json (python -m active_oracle_evaluation.experiments.yahtzee_panel).
+panel_seed = 20260831
+# Normal quantile of the interval criterion. From the paper: a 95% interval on the difference
+# excludes zero (section "In a solved game, suite regret recovers the ranking but not the
+# magnitudes", paragraph "Per-decision scoring pays most near optimal play"; appendix "Statistical
+# protocol: derivations and definitions", paragraph "Sample-size relation").
+interval_quantile = 0.975
+# Power of the second criterion. From the paper: "a test at 80% power" (appendix "Statistical
+# protocol: derivations and definitions", paragraph "Sample-size relation").
+power = 0.80
+# Largest allowed |V*(start) - 254.5877|. The anchor is from the paper (appendix "Solitaire Yahtzee:
+# exact ground truth", paragraph "The solved game"); the tolerance is chosen for this study.
+v_star_tolerance = 5e-5
+# Largest allowed |z| of the simulated score and regret means against their exact values.
+# Chosen for this study.
+z_limit = 5
+# Largest allowed |SD of optimal - 59.61|. The anchor is from the paper (appendix "Solitaire
+# Yahtzee: exact ground truth", paragraph "The solved game"); the tolerance is chosen for this
+# study.
+sd_tolerance = 0.01

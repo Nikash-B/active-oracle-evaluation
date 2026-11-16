@@ -1,0 +1,18 @@
+# Exact versions of the Python 3.13 environment used for the paper (from `uv pip freeze`).
+# pyproject.toml extras ([nn], [dev], [oracle]) list what to install; this file pins versions:
+#   pip install -r requirements.txt
+# Not listed: the editable local package, pip/setuptools/wheel and packages the code never uses.
+filelock==3.29.4
+fsspec==2026.6.0
+gnubg-nn==1.1.0a8
+jinja2==3.1.6
+markupsafe==3.0.3
+mpmath==1.3.0
+networkx==3.6.1
+numpy==2.5.0
+ruff==0.15.18
+scipy==1.18.0
+sympy==1.14.0
+torch==2.12.1
+typing-extensions==4.15.0
+xgdatatools==0.0.1
